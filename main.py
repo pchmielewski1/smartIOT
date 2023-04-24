@@ -6,6 +6,8 @@ import random
 import onewire
 import ds18x20
 
+import json
+
 # Default  MQTT_BROKER to connect to
 MQTT_BROKER = "192.168.0.84"
 CLIENT_ID = ubinascii.hexlify(machine.unique_id())
@@ -21,6 +23,7 @@ led_red = machine.Pin(10,machine.Pin.OUT)
 # Publish MQTT messages after every set timeout
 last_publish = time.time()
 publish_interval = 10
+
 
 # czujknik temp
 
@@ -41,11 +44,34 @@ conversion_factor = 3.3 / (65535)
 
 # Received messages from subscriptions will be delivered to this callback
 def sub_cb(topic, msg):
-    print((topic, msg))
-    if msg.decode() == "ON":
-        led_red.value(1)
+    #print((topic, msg))
+    #tak jest
+    
+    incoming = json.loads(msg)
+    print(incoming) 
+    if not (incoming.get('state') is None):
+        print("jest status")
+        print(incoming.get('state'))
+        if (incoming.get('state') == "ON"):
+            led_red.value(1)
+        else:
+            led_red.value(0)
+    elif not (incoming.get('interval') is None):
+        print("jest interval")
+        print(incoming.get('interval'))
+        publish_interval = incoming.get('interval')
+        print(publish_interval)
     else:
-        led_red.value(0)
+        print("value is not present for given JSON key")
+    
+    
+    
+    
+    #tak było 
+    #if msg.decode() == "ON":
+    #    led_red.value(1)
+    #else:
+    #    led_red.value(0)
 
 
 def reset():
@@ -59,7 +85,7 @@ def get_temperature_reading():
     for rom in roms:
         ds_sensor.convert_temp()
         time.sleep_ms(750)
-        print(rom)
+        #print(rom)
         ds_temp = ds_sensor.read_temp(rom)
         ds_temperature = "{:.2f}".format(ds_temp)
         return ds_temperature 
