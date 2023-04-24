@@ -15,6 +15,9 @@ PUBLISH_TOPIC = "zigbee2mqtt/pico2"
 # Setup built in PICO LED as Output
 led = machine.Pin("LED",machine.Pin.OUT)
 
+led_green = machine.Pin(21,machine.Pin.OUT)
+led_red = machine.Pin(10,machine.Pin.OUT)
+
 # Publish MQTT messages after every set timeout
 last_publish = time.time()
 publish_interval = 10
@@ -40,9 +43,9 @@ conversion_factor = 3.3 / (65535)
 def sub_cb(topic, msg):
     print((topic, msg))
     if msg.decode() == "ON":
-        led.value(1)
+        led_red.value(1)
     else:
-        led.value(0)
+        led_red.value(0)
 
 
 def reset():
@@ -50,7 +53,7 @@ def reset():
     time.sleep(10)
     machine.reset()
     
-# Generate dummy random temperature readings    
+# Generate random temperature readings from ds18b20   
 def get_temperature_reading():
     #return random.randint(20, 50)
     for rom in roms:
