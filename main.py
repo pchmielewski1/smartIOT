@@ -9,7 +9,7 @@ import ds18x20
 # Default  MQTT_BROKER to connect to
 MQTT_BROKER = "192.168.0.84"
 CLIENT_ID = ubinascii.hexlify(machine.unique_id())
-SUBSCRIBE_TOPIC = b"led"
+SUBSCRIBE_TOPIC = b"zigbee2mqtt/pico2/set"
 PUBLISH_TOPIC = "zigbee2mqtt/pico2"
 
 # Setup built in PICO LED as Output
