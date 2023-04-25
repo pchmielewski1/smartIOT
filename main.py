@@ -25,6 +25,7 @@ last_publish = time.time()
 publish_interval = 10
 
 
+
 # czujknik temp
 
 ds_pin = machine.Pin(28)
@@ -44,9 +45,7 @@ conversion_factor = 3.3 / (65535)
 
 # Received messages from subscriptions will be delivered to this callback
 def sub_cb(topic, msg):
-    #print((topic, msg))
-    #tak jest
-    
+    #print((topic, msg))  
     incoming = json.loads(msg)
     print(incoming) 
     if not (incoming.get('state') is None):
@@ -58,20 +57,11 @@ def sub_cb(topic, msg):
             led_red.value(0)
     elif not (incoming.get('interval') is None):
         print("jest interval")
-        print(incoming.get('interval'))
+        global publish_interval
         publish_interval = incoming.get('interval')
         print(publish_interval)
     else:
         print("value is not present for given JSON key")
-    
-    
-    
-    
-    #tak było 
-    #if msg.decode() == "ON":
-    #    led_red.value(1)
-    #else:
-    #    led_red.value(0)
 
 
 def reset():
