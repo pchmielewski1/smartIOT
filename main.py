@@ -26,9 +26,9 @@ publish_interval = 10
 
 
 
-# czujknik temp
+# czujknik temp b18d20 
 
-ds_pin = machine.Pin(28)
+ds_pin = machine.Pin(2)
  
 ds_sensor = ds18x20.DS18X20(onewire.OneWire(ds_pin))
  
@@ -40,6 +40,8 @@ roms = ds_sensor.scan()
 bat_v = machine.ADC(0)
 conversion_factor = 3.3 / (65535)
 
+# Capacitive Soil Moisture Sensor V2.0 HW-390
+moisture_v = machine.ADC(1)
 
 
 
@@ -93,9 +95,10 @@ def main():
             global last_publish
             if (time.time() - last_publish) >= publish_interval:            
                 now_temp = get_temperature_reading()
-                reading_bat = round(1.45 + (bat_v.read_u16() * conversion_factor), 2)
-                print(reading_bat, now_temp, publish_interval)
-                mqttClient.publish(PUBLISH_TOPIC, b'{"temperature":' + str(now_temp).encode() + b',"battery":' + str(reading_bat).encode() + b',"interval":' + str(publish_interval).encode() + b'}' )
+                reading_bat = round(1.55 + (bat_v.read_u16() * conversion_factor), 2)
+                moisture = round(moisture_v.read_u16(), 2)
+                print(reading_bat, now_temp, publish_interval, moisture)
+                mqttClient.publish(PUBLISH_TOPIC, b'{"temperature":' + str(now_temp).encode() + b',"moisture":' + str(moisture).encode() + b',"battery":' + str(reading_bat).encode() + b',"interval":' + str(publish_interval).encode() + b'}' )
                 last_publish = time.time()
             time.sleep(1)
 
