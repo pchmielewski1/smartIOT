@@ -2,7 +2,6 @@ import time
 import ubinascii
 from umqtt.simple import MQTTClient
 import machine
-import random
 import onewire
 import ds18x20
 
@@ -81,7 +80,20 @@ def get_temperature_reading():
         ds_temp = ds_sensor.read_temp(rom)
         ds_temperature = "{:.2f}".format(ds_temp)
         return ds_temperature 
+
+def medium_moisture():
+    lista = []
+    for i in range(100):
+        tmp = moisture_v.read_u16()
+        lista.insert(i, tmp)
+        time.sleep(.01)
     
+    suma = 0
+    for j in lista:
+        suma = suma + j
+    return suma/len(lista)
+
+
 def main():
     print(f"Begin connection with MQTT Broker :: {MQTT_BROKER}")
     mqttClient = MQTTClient(CLIENT_ID, MQTT_BROKER, keepalive=60)
@@ -96,7 +108,8 @@ def main():
             if (time.time() - last_publish) >= publish_interval:            
                 now_temp = get_temperature_reading()
                 reading_bat = round(1.55 + (bat_v.read_u16() * conversion_factor), 2)
-                moisture = round(moisture_v.read_u16(), 2)
+                moisture = round(medium_moisture(), 1)
+                
                 print(reading_bat, now_temp, publish_interval, moisture)
                 mqttClient.publish(PUBLISH_TOPIC, b'{"temperature":' + str(now_temp).encode() + b',"moisture":' + str(moisture).encode() + b',"battery":' + str(reading_bat).encode() + b',"interval":' + str(publish_interval).encode() + b'}' )
                 last_publish = time.time()
